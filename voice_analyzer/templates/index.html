@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>conservatory.ai — Konservatuar Düzeyinde Vokal Analiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&family=Noto+Sans+Arabic:wght@400;500;600&family=Noto+Sans+JP:wght@400;500&family=Noto+Sans+KR:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500&family=Noto+Sans+Bengali:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/chart.min.js') }}"></script>
+</head>
+<body>
+    <div class="grain"></div>
+    
+    <header class="masthead">
+        <div class="masthead-inner">
+            <div class="brand">
+                <span class="brand-mark">℘</span>
+                <span class="brand-name">conservatory.ai</span>
+            </div>
+            <div class="masthead-right">
+                <nav class="meta-nav">
+                    <span class="meta-item">EST. 2026</span>
+                    <span class="meta-divider">·</span>
+                    <span class="meta-item">VOL. I</span>
+                    <span class="meta-divider">·</span>
+                    <span class="meta-item" id="datestamp"></span>
+                </nav>
+                <div class="lang-selector">
+                    <button class="lang-toggle" id="lang-toggle">
+                        <span id="current-lang-flag">🇹🇷</span>
+                        <span id="current-lang-name">Türkçe</span>
+                        <span class="lang-chevron">▾</span>
+                    </button>
+                    <div class="lang-menu" id="lang-menu"></div>
+                </div>
+            </div>
+        </div>
+        <div class="masthead-rule"></div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-tag" data-i18n="hero_tag">— KONSERVATUAR DÜZEYİNDE FONETİK ANALİZ —</div>
+        <h1 class="hero-title">
+            <span class="hero-line" data-i18n="hero_line_1">Sesinizin</span>
+            <span class="hero-line italic" data-i18n="hero_line_2">anatomisi</span>
+            <span class="hero-line" data-i18n="hero_line_3">ortaya çıkıyor.</span>
+        </h1>
+        <p class="hero-subtitle" data-i18n="hero_subtitle">
+            Tessitura, passaggio, formant, vibrato, jitter ve shimmer.
+            Praat tabanlı bilimsel analiz ile vokal yapınızı operatik standartta inceleyin.
+        </p>
+    </section>
+
+    <section class="upload-section" id="upload-section">
+        <div class="section-label">
+            <span class="label-num">01</span>
+            <span class="label-text" data-i18n="section_01">KAYIT TESLİMİ</span>
+        </div>
+
+        <!-- IMPORTANT WARNING BANNER -->
+        <div class="warning-banner">
+            <div class="warning-icon">⚠</div>
+            <div class="warning-content">
+                <h3 class="warning-title" data-i18n="warning_title">SADECE SAF VOKAL KAYITLARI</h3>
+                <p class="warning-text" data-i18n-html="warning_text">Bu sistem yalnızca <strong>arkaplan müziği olmayan</strong>, sadece sesinizin olduğu kayıtları doğru analiz edebilir. Şarkı söyleme kayıtları (enstrüman eşliğindeki müzik dosyaları) yanlış sonuç verir — algoritma bas gitar veya düşük enstrümanları vokal sanır.</p>
+                <p class="warning-good">
+                    <span data-i18n="warning_good_label">✓ İYİ:</span>
+                    <span data-i18n="warning_good_examples">vokalize, arpej, glissando, a capella şarkı, mırıldanma</span>
+                </p>
+                <p class="warning-bad">
+                    <span data-i18n="warning_bad_label">✗ KÖTÜ:</span>
+                    <span data-i18n="warning_bad_examples">stüdyo şarkı kayıtları, müzik klipler, karaoke (eşlik içeriyorsa)</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="upload-modes">
+            <button class="mode-btn active" data-mode="upload">
+                <span class="mode-icon">⬆</span>
+                <span class="mode-label" data-i18n="upload_mode">Dosya Yükle</span>
+            </button>
+            <button class="mode-btn" data-mode="record">
+                <span class="mode-icon">●</span>
+                <span class="mode-label" data-i18n="record_mode">Canlı Kayıt</span>
+            </button>
+        </div>
+
+        <div class="upload-area" id="upload-area">
+            <input type="file" id="file-input" accept="audio/*" hidden>
+            <div class="upload-zone" id="upload-zone">
+                <div class="upload-icon">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                        <path d="M24 32V16M24 16L16 24M24 16L32 24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 32V36C8 38.2091 9.79086 40 12 40H36C38.2091 40 40 38.2091 40 36V32" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <p class="upload-text" data-i18n="upload_text">Ses dosyanızı buraya bırakın</p>
+                <p class="upload-hint" data-i18n="upload_hint">veya tıklayarak seçin · WAV, MP3, OGG, FLAC, M4A · max 50 MB</p>
+                <p class="upload-hint upload-tip"><em data-i18n="upload_tip">En az 15 saniye, mümkünse hem alçak hem yüksek notalar içersin</em></p>
+                <p class="upload-reminder" data-i18n="upload_reminder">🎤 Sadece sesinizin olduğu, müziksiz kayıtlar yükleyin</p>
+            </div>
+        </div>
+
+        <div class="record-area" id="record-area" style="display: none;">
+            <div class="record-zone">
+                <div class="record-visualizer" id="record-visualizer">
+                    <div class="bar-grid">
+                        <div class="vis-bar"></div><div class="vis-bar"></div><div class="vis-bar"></div>
+                        <div class="vis-bar"></div><div class="vis-bar"></div><div class="vis-bar"></div>
+                        <div class="vis-bar"></div><div class="vis-bar"></div><div class="vis-bar"></div>
+                        <div class="vis-bar"></div><div class="vis-bar"></div><div class="vis-bar"></div>
+                        <div class="vis-bar"></div><div class="vis-bar"></div><div class="vis-bar"></div>
+                    </div>
+                </div>
+                <div class="record-controls">
+                    <button class="record-btn" id="record-btn">
+                        <span class="record-dot"></span>
+                        <span class="record-label" data-i18n="record_start">KAYIT BAŞLAT</span>
+                    </button>
+                    <div class="record-time" id="record-time">00:00</div>
+                </div>
+                <p class="upload-hint" data-i18n="record_hint">Mikrofon izni gerekir · Bir vokalize, arpej veya glissando deneyin</p>
+            </div>
+        </div>
+
+        <button class="analyze-btn" id="analyze-btn" disabled>
+            <span data-i18n="analyze">ANALİZ ET</span>
+            <span class="arrow">→</span>
+        </button>
+    </section>
+
+    <section class="loading-section" id="loading-section" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-bars">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <p class="loading-text" data-i18n="loading_text">Spektral analiz yürütülüyor</p>
+            <p class="loading-substext" id="loading-substext">...</p>
+        </div>
+    </section>
+
+    <section class="results-section" id="results-section" style="display: none;">
+        
+        <div class="result-block headline-block">
+            <div class="section-label">
+                <span class="label-num">02</span>
+                <span class="label-text" data-i18n="section_02">VOKAL FACH SINIFLANDIRMASI</span>
+            </div>
+            
+            <!-- LOW CONFIDENCE WARNING (only shown when confidence < 60%) -->
+            <div class="low-confidence-warning" id="low-confidence-warning" style="display: none;">
+                <div class="lc-warning-icon">⚠</div>
+                <div class="lc-warning-content">
+                    <strong data-i18n="lc_warning_title">Düşük Güven Skoru</strong>
+                    <p data-i18n-html="lc_warning_text">Sonuç güveni düşük. Bu genellikle kayıtta arkaplan müziği, gürültü veya yetersiz vokal süresi olduğunu gösterir. Daha doğru sonuç için: <strong>tek başına vokalize, en az 30 saniye, sessiz ortamda</strong> bir kayıt deneyin.</p>
+                </div>
+            </div>
+            
+            <div class="voice-type-display">
+                <div class="voice-type-name" id="voice-type-name">—</div>
+                <div class="voice-type-confidence">
+                    <span id="voice-type-confidence">—</span>
+                    <span class="confidence-label" id="voice-type-label">—</span>
+                </div>
+            </div>
+            <div class="alternatives" id="alternatives"></div>
+            <p class="disclaimer">
+                <em data-i18n="disclaimer">Not: Tek kayıttan kesin teşhis profesyonelce değildir.</em>
+            </p>
+        </div>
+
+        <div class="result-block">
+            <div class="section-label">
+                <span class="label-num">03</span>
+                <span class="label-text" data-i18n="section_03">SES ARALIĞI & TESSITURA</span>
+            </div>
+            <div class="metric-grid">
+                <div class="metric-card large">
+                    <span class="metric-name" data-i18n="total_range">Toplam Aralık</span>
+                    <div class="range-display">
+                        <span class="range-note" id="min-note">—</span>
+                        <span class="range-arrow">↔</span>
+                        <span class="range-note" id="max-note">—</span>
+                    </div>
+                    <div class="range-detail">
+                        <span id="min-hz">— Hz</span> — <span id="max-hz">— Hz</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-name" data-i18n="octave_range">Oktav Aralığı</span>
+                    <span class="metric-value" id="octave-range">—</span>
+                    <span class="metric-unit">oct</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-name" data-i18n="semitone_range">Yarım Ton</span>
+                    <span class="metric-value" id="semitone-range">—</span>
+                    <span class="metric-unit">st</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-name" data-i18n="tessitura_low">Tessitura Alt</span>
+                    <span class="metric-value" id="tess-low">—</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-name" data-i18n="tessitura_high">Tessitura Üst</span>
+                    <span class="metric-value" id="tess-high">—</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-name" data-i18n="comfortable_zone">En Rahat Bölge</span>
+                    <span class="metric-value" id="comfortable-note">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-block">
+            <div class="section-label">
+                <span class="label-num">04</span>
+                <span class="label-text" data-i18n="section_04">PITCH CONTOUR — ZAMAN/FREKANS</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="pitchChart"></canvas>
+            </div>
+        </div>
+
+        <div class="result-block">
+            <div class="section-label">
+                <span class="label-num">05</span>
+                <span class="label-text" data-i18n="section_05">PASSAGGIO — GEÇİŞ BÖLGELERİ</span>
+            </div>
+            <div class="passaggio-display">
+                <div class="passaggio-card">
+                    <span class="passaggio-label" data-i18n="primo_passaggio">Primo Passaggio</span>
+                    <span class="passaggio-note" id="primo-passaggio">—</span>
+                    <span class="passaggio-desc" data-i18n="primo_desc">Göğüs → Karışık register geçişi</span>
+                </div>
+                <div class="passaggio-card">
+                    <span class="passaggio-label" data-i18n="secondo_passaggio">Secondo Passaggio</span>
+                    <span class="passaggio-note" id="secondo-passaggio">—</span>
+                    <span class="passaggio-desc" data-i18n="secondo_desc">Karışık → Kafa register geçişi</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-block">
+            <div class="section-label">
+                <span class="label-num">06</span>
+                <span class="label-text" data-i18n="section_06">VİBRATO ANALİZİ</span>
+            </div>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <span class="metric-name" data-i18n="vibrato_rate">Hız (Rate)</span>
+                    <span class="metric-value" id="vibrato-rate">—</span>
+                    <span class="metric-unit">Hz</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-name" data-i18n="vibrato_extent">Genlik (Extent)</span>
+                    <span class="metric-value" id="vibrato-extent">—</span>
+                    <span class="metric-unit">st</span>
+                </div>
+                <div class="metric-card large">
+                    <span class="metric-name" data-i18n="vibrato_quality">Kalite Değerlendirmesi</span>
+                    <span class="metric-text" id="vibrato-quality">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-block">
+            <div class="section-label">
+                <span class="label-num">07</span>
+                <span class="label-text" data-i18n="section_07">VOKAL SAĞLIK GÖSTERGELERİ</span>
+            </div>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <span class="metric-name">Jitter (Local)</span>
+                    <span class="metric-value" id="jitter">—</span>
+                    <span class="metric-unit">% (norm: <1.04)</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-name">Shimmer (Local)</span>
+                    <span class="metric-value" id="shimmer">—</span>
+                    <span class="metric-unit">% (norm: <3.81)</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-name">HNR</span>
+                    <span class="metric-value" id="hnr">—</span>
+                    <span class="metric-unit">dB</span>
+                </div>
+                <div class="metric-card large">
+                    <span class="metric-name" data-i18n="health_status">Ses Sağlığı Yorumu</span>
+                    <span class="metric-text" id="health-status">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-block">
+            <div class="section-label">
+                <span class="label-num">08</span>
+                <span class="label-text" data-i18n="section_08">FORMANT ANALİZİ</span>
+            </div>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <span class="metric-name">F1</span>
+                    <span class="metric-value" id="f1">—</span>
+                    <span class="metric-unit">Hz</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-name">F2</span>
+                    <span class="metric-value" id="f2">—</span>
+                    <span class="metric-unit">Hz</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-name">F3</span>
+                    <span class="metric-value" id="f3">—</span>
+                    <span class="metric-unit">Hz</span>
+                </div>
+                <div class="metric-card large">
+                    <span class="metric-name">Singer's Formant (2800-3200 Hz)</span>
+                    <span class="metric-text" id="singers-formant">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-block">
+            <div class="section-label">
+                <span class="label-num">09</span>
+                <span class="label-text" data-i18n="section_09">DİNAMİK ARALIK</span>
+            </div>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <span class="metric-name" data-i18n="dynamic_min">En Düşük</span>
+                    <span class="metric-value" id="dynamic-min">—</span>
+                    <span class="metric-unit">dB</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-name" data-i18n="dynamic_max">En Yüksek</span>
+                    <span class="metric-value" id="dynamic-max">—</span>
+                    <span class="metric-unit">dB</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-name" data-i18n="dynamic_total">Toplam</span>
+                    <span class="metric-value" id="dynamic-range">—</span>
+                    <span class="metric-unit">dB</span>
+                </div>
+                <div class="metric-card large">
+                    <span class="metric-name" data-i18n="dynamic_comment">Yorum</span>
+                    <span class="metric-text" id="dynamic-desc">—</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-block recommendations-block">
+            <div class="section-label">
+                <span class="label-num">10</span>
+                <span class="label-text" data-i18n="section_10">EĞİTMEN DEĞERLENDİRMESİ</span>
+            </div>
+            <div class="recommendations">
+                <div class="rec-column rec-strengths">
+                    <h3 class="rec-heading" data-i18n="strengths">↗ Güçlü Yanlar</h3>
+                    <ul id="strengths-list"></ul>
+                </div>
+                <div class="rec-column rec-suggestions">
+                    <h3 class="rec-heading" data-i18n="suggestions">○ Çalışma Önerileri</h3>
+                    <ul id="recommendations-list"></ul>
+                </div>
+                <div class="rec-column rec-warnings">
+                    <h3 class="rec-heading" data-i18n="warnings">! Dikkat Edilecekler</h3>
+                    <ul id="warnings-list"></ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPERTOIRE GUIDE -->
+        <div class="result-block repertoire-block" id="repertoire-section">
+            <div class="section-label">
+                <span class="label-num">11</span>
+                <span class="label-text" data-i18n="section_11">REPERTUVAR REHBERİ</span>
+            </div>
+            
+            <div class="repertoire-description">
+                <div class="rep-section-header" data-i18n="voice_description">Ses Türü Açıklaması</div>
+                <p class="rep-description-text" id="rep-description">—</p>
+            </div>
+
+            <div class="genres-grid">
+                <div class="genre-card classical">
+                    <h4 class="genre-title" data-i18n="classical_genres">Klasik Türler</h4>
+                    <ul class="genre-list" id="classical-genres-list"></ul>
+                </div>
+                <div class="genre-card modern">
+                    <h4 class="genre-title" data-i18n="modern_genres">Modern Türler</h4>
+                    <ul class="genre-list" id="modern-genres-list"></ul>
+                </div>
+            </div>
+
+            <div class="repertoire-examples">
+                <div class="rep-block">
+                    <h4 class="rep-block-title">
+                        <span class="rep-marker">◐</span>
+                        <span data-i18n="classical_repertoire">Klasik Repertuvar Örnekleri</span>
+                    </h4>
+                    <ul class="rep-list" id="classical-rep-list"></ul>
+                </div>
+                <div class="rep-block">
+                    <h4 class="rep-block-title">
+                        <span class="rep-marker">◑</span>
+                        <span data-i18n="modern_repertoire">Modern Repertuvar Örnekleri</span>
+                    </h4>
+                    <ul class="rep-list" id="modern-rep-list"></ul>
+                </div>
+            </div>
+
+            <div class="tips-grid">
+                <div class="tip-card avoid">
+                    <h4 class="tip-title">
+                        <span class="tip-icon">⚠</span>
+                        <span data-i18n="avoid_label">Kaçınılması Gerekenler</span>
+                    </h4>
+                    <p id="avoid-text">—</p>
+                </div>
+                <div class="tip-card training">
+                    <h4 class="tip-title">
+                        <span class="tip-icon">✦</span>
+                        <span data-i18n="training_tips">Eğitim Tavsiyeleri</span>
+                    </h4>
+                    <p id="training-tips-text">—</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-actions">
+            <button class="action-btn" id="download-report">
+                <span data-i18n="download_report">JSON RAPORU İNDİR</span>
+                <span class="arrow">↓</span>
+            </button>
+            <button class="action-btn secondary" id="new-analysis">
+                <span data-i18n="new_analysis">YENİ ANALİZ</span>
+                <span class="arrow">↻</span>
+            </button>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-rule"></div>
+        <div class="footer-content">
+            <p class="footer-credo">
+                "<em data-i18n="footer_credo">La voce è l'anima fatta suono.</em>"
+                <span class="footer-attr" data-i18n="footer_attr">— vokal pedagojinin temel ilkesi</span>
+            </p>
+            <p class="footer-tech" data-i18n="footer_tech">
+                Praat · librosa · parselmouth · Flask · konservatuar standartlarına göre kalibre edilmiştir
+            </p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/translations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
